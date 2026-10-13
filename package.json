@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --env-file .env src/main.ts"
+    "chatbot-cli": "node --env-file .env src/main.ts"
   },
   "keywords": [],
   "author": "",

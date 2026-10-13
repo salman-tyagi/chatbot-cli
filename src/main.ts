@@ -1,7 +1,6 @@
 import readline from 'node:readline/promises';
 
 import { ChatOllama } from '@langchain/ollama';
-import { SYSTEM_PROMPT } from './constants.js';
 
 async function main() {
   const llm = new ChatOllama({
@@ -25,7 +24,7 @@ async function main() {
       }
 
       const res = await llm.invoke([
-        ['system', SYSTEM_PROMPT],
+        ['system', process.env.SYSTEM_PROMPT!],
         ['human', context.join('\n')],
       ]);
 
