@@ -5,7 +5,7 @@ import { ChatOllama } from '@langchain/ollama';
 async function main() {
   const llm = new ChatOllama({
     model: process.env.OLLAMA_MODEL!,
-    temperature: 0.5,
+    temperature: 0.3,
   });
 
   const context: string[] = [];
@@ -16,23 +16,28 @@ async function main() {
     try {
       const query = await rl.question('You: ');
 
-      context.push(`User: ${query}`);
-
       if (query === '/exit') {
         rl.close();
         process.exit(1);
       }
 
-      const res = await llm.invoke([
+      context.push(`User: ${query}`);
+
+      const stream = await llm.stream([
         ['system', process.env.SYSTEM_PROMPT!],
         ['human', context.join('\n')],
       ]);
 
-      const assistant = res.content;
+      for await (const chunk of stream) {
+        const chunkContent = chunk.content;
 
-      context.push(`Assistant: ${assistant}`);
+        if (typeof chunkContent === 'string') {
+          context.push(`AI: ${chunkContent}`);
+          process.stdout.write(chunkContent);
+        }
+      }
 
-      console.log('Assistant:', assistant);
+      process.stdout.write('\n');
     } catch (err: unknown) {
       console.error(err instanceof Error ? err.message : err);
       process.exit(1);
